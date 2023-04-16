@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import datetime
 from kafka import KafkaProducer
+from minio import Minio
+from minio.error import S3Error
+import datetime
 
 """
 Mini-Projet : Traitement de l'Intelligence Artificielle
@@ -56,9 +59,10 @@ def add_data(df: pd.DataFrame):
         i += 1
     return df
 
-def write_data(df: pd.DataFrame):
+def write_data_kafka(df: pd.DataFrame):
     """
     Cette méthode permet d'écrire le DataFrame vers Kafka.
+    (Optionnel)
     """
     csv_string = df.to_csv(index=False)
     producer = KafkaProducer(
@@ -67,8 +71,30 @@ def write_data(df: pd.DataFrame):
     producer.send('nom_du_topic', value=bytes(csv_string, 'utf-8'))
     producer.close()
 
+def write_data_minio(df: pd.DataFrame):
+    """
+    Cette méthode permet d'écrire le DataFrame vers Minio.
+    (Obligatoire)
+    """
+    client = Minio(
+        "localhost:9001",
+        secure=False,
+        access_key="minio",
+        secret_key="minio123"
+    )
+    found = client.bucket_exists("donnes-capteurs")
+    if not found:
+        client.make_bucket("donnes-capteurs")
+    else:
+        print("Bucket 'donnes-capteurs' existe déjà")
+
+    timestamp = datetime.datetime.now().strftime('%d-%m-%y %H:%M:%S')
+    df.to_csv("donnes_capteurs_" + str(timestamp) + ".csv", encoding='utf-8', index=False)
+    client.fput_object(
+        "donnes-capteurs", "donnes_capteurs_" + str(timestamp) + ".csv",  "donnes_capteurs_" + str(timestamp) + ".csv")
 
 if __name__ == "__main__":
     columns = ["timestamp", "entrance_amount", "exit_amount", "temperature", "humidity", "parking_entrance", "parking_exit", "parking_actual_vehicle"]
     df = generate_dataFrame(columns)
-    write_data(df)
+
+    write_data_minio(df)
