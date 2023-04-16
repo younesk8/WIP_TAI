@@ -1,36 +1,43 @@
 from kafka import KafkaProducer
 from pyspark.sql import SparkSession
+from pyspark.sql import *
+from pyspark.sql.types import *
 
-# Connect to Kafka producer
-producer = KafkaProducer(bootstrap_servers='localhost:9092')
 
-# Connect to local Spark instance
-spark = SparkSession.builder.appName("CapteursDataStorage").getOrCreate()
+def main():
+  # Connect to Kafka producer
+  producer = KafkaProducer(bootstrap_servers='localhost:9092')
 
-# Define schema for Capteurs data
-schema = StructType([
-    StructField("sensor_id", IntegerType(), True),
-    StructField("temperature", DoubleType(), True),
-    StructField("humidity", DoubleType(), True),
-    StructField("timestamp", TimestampType(), True)
-])
+  # Connect to local Spark instance
+  spark = SparkSession.builder.appName("CapteursDataStorage").getOrCreate()
 
-# Define Kafka topic to read from
-topic = "donnees_capteurs"
+  # Define schema for Capteurs data
+  schema = StructType([
+      StructField("sensor_id", IntegerType(), True),
+      StructField("temperature", DoubleType(), True),
+      StructField("humidity", DoubleType(), True),
+      StructField("timestamp", TimestampType(), True)
+  ])
 
-df = spark \
-  .readStream \
-  .format("kafka") \
-  .option("kafka.bootstrap.servers", "localhost:9092") \
-  .option("subscribe", topic) \
-  .option("startingOffsets", "earliest") \
-  .load() \
-  .select(from_json(col("value").cast("string"), schema).alias("data")) \
-  .select("data.*")
+  # Define Kafka topic to read from
+  topic = "donnees_capteurs"
 
-query = df \
-    .writeStream \
-    .format("parquet") \
-    .option("path", "capteurs_data_storage") \
-    .option("checkpointLocation", "capteurs_data_storage_checkpoint") \
-    .start()
+  df = spark \
+    .readStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "localhost:9092") \
+    .option("subscribe", topic) \
+    .option("startingOffsets", "earliest") \
+    .load() \
+    .select(from_json(col("value").cast("string"), schema).alias("data")) \
+    .select("data.*")
+  df.show()
+
+# query = df \
+#    .writeStream \
+#    .format("parquet") \
+#    .option("path", "capteurs_data_storage") \
+#    .option("checkpointLocation", "capteurs_data_storage_checkpoint") \
+#    .start()
+if __name__ == "__main__":
+  main()

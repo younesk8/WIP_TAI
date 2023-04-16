@@ -37,11 +37,13 @@ if __name__ == "__main__":
 
 
     history = regression_model.fit(
-        train_features['Horsepower'],
+        train_features[''],
         train_labels,
-        epochs=100,
+        epochs=50,
         # Suppress logging.
         verbose=0,
         # Calculate validation results on 20% of the training data.
         validation_split = 0.1)
+    
+    regression_model.save('saved_model/my_model')
 
