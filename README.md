@@ -21,5 +21,17 @@ Pour installer Kafka : Deux choix:
 - Soit avec Conduktor (Le plus simple)
 - Soit avec Docker-compose (Plus compliqué).
 
-Pour Hadoop, je vous conseil la méthode Docker qui est moins casse-tête à installer
-(Les instructions vont venir au fil de l'eau, le temps de que je complète le code)
+pour installer un dataLake ( ici minIO type S3 ):
+
+ - lancer la commande docker-compose up
+ - attendre
+ - attendre
+ - attendre encore un peu
+ - quand c'est fini, ouvrir le docker desktop et ouvrez l'url sur le conteneur minIO
+ pour se connecter c'est minio et minio123
+ vous avez une bucket de deja préte qui s'appel wherhaouse.
+ - ouvrir le conteneur spark-notebook mais au niveau des logs, cliquer sur le lien qui ressemble a:
+ http://127.0.0.1:8888/lab?token=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ 
+ - vous pouvez copier le code python sur les cellules jupyter
+ 
