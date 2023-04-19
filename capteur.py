@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import datetime
-from kafka import KafkaProducer
+#from kafka import KafkaProducer
 from minio import Minio
 from minio.error import S3Error
 import datetime
@@ -77,7 +77,7 @@ def write_data_minio(df: pd.DataFrame):
     (Obligatoire)
     """
     client = Minio(
-        "localhost:9001",
+        "localhost:9000",
         secure=False,
         access_key="minio",
         secret_key="minio123"
@@ -88,7 +88,7 @@ def write_data_minio(df: pd.DataFrame):
     else:
         print("Bucket 'donnes-capteurs' existe déjà")
 
-    timestamp = datetime.datetime.now().strftime('%d-%m-%y %H:%M:%S')
+    timestamp = datetime.datetime.now().strftime('%d-%m-%y')
     df.to_csv("donnes_capteurs_" + str(timestamp) + ".csv", encoding='utf-8', index=False)
     client.fput_object(
         "donnes-capteurs", "donnes_capteurs_" + str(timestamp) + ".csv",  "donnes_capteurs_" + str(timestamp) + ".csv")
