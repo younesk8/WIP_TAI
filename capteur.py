@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 import datetime
-#from kafka import KafkaProducer
+from kafka import *
 from minio import Minio
 from minio.error import S3Error
 import datetime
+import json
 
 """
 Mini-Projet : Traitement de l'Intelligence Artificielle
@@ -59,15 +60,41 @@ def add_data(df: pd.DataFrame):
         i += 1
     return df
 
+
+def add_datatokafka():
+    """
+    Cette méthode permet d'ajouter de la donnée vers votre DataFrame Pandas
+    """
+    # temps_execution =
+    current_timestamp = datetime.datetime.now()
+    while 1:
+        ## Dans cette boucle, vous devez créer et ajouter des données dans Pandas à valeur aléatoire.
+        ## Chaque itération comportera 1 ligne à ajouter.
+        new_timestamp = current_timestamp + datetime.timedelta(seconds=1)
+        entrance_amount = np.random.randint(low=0, high=50)
+        exit_amount = np.random.randint(low=0, high=50)
+        temperature = np.random.normal(loc=20, scale=5)
+        humidity = np.random.normal(loc=50, scale=10)
+        parking_entrance = np.random.randint(low=1, high=5)
+        parking_exit = np.random.randint(low=1, high=5)
+        parking_actual_vehicle = np.random.randint(low=0, high=500)
+
+        liste = [new_timestamp.isoformat(), entrance_amount, exit_amount, temperature, humidity, parking_entrance, parking_exit,
+         parking_actual_vehicle]
+
+        # ajouter une ligne au DataFrame
+        producer = KafkaProducer( bootstrap_servers=['127.0.0.1:9092'],value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+        producer.send("capteur", liste)
+
+
+
 def write_data_kafka(df: pd.DataFrame):
     """
     Cette méthode permet d'écrire le DataFrame vers Kafka.
     (Optionnel)
     """
     csv_string = df.to_csv(index=False)
-    producer = KafkaProducer(
-        bootstrap_servers=['localhost:9092']
-    )
+    producer = KafkaProducer( bootstrap_servers=['127.0.0.1:9092'])
     producer.send('nom_du_topic', value=bytes(csv_string, 'utf-8'))
     producer.close()
 
@@ -94,7 +121,7 @@ def write_data_minio(df: pd.DataFrame):
         "donnes-capteurs", "donnes_capteurs_" + str(timestamp) + ".csv",  "donnes_capteurs_" + str(timestamp) + ".csv")
 
 if __name__ == "__main__":
-    columns = ["timestamp", "entrance_amount", "exit_amount", "temperature", "humidity", "parking_entrance", "parking_exit", "parking_actual_vehicle"]
-    df = generate_dataFrame(columns)
-
-    write_data_minio(df)
+    #columns = ["timestamp", "entrance_amount", "exit_amount", "temperature", "humidity", "parking_entrance", "parking_exit", "parking_actual_vehicle"]
+    #df = generate_dataFrame(columns)
+    #write_data_kafka(df)
+    add_datatokafka()
