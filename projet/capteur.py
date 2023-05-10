@@ -121,7 +121,7 @@ def write_data_minio(df: pd.DataFrame):
         "donnes-capteurs", "donnes_capteurs_" + str(timestamp) + ".csv",  "donnes_capteurs_" + str(timestamp) + ".csv")
 
 if __name__ == "__main__":
-    #columns = ["timestamp", "entrance_amount", "exit_amount", "temperature", "humidity", "parking_entrance", "parking_exit", "parking_actual_vehicle"]
-    #df = generate_dataFrame(columns)
-    #write_data_kafka(df)
-    #add_datatokafka()
+    columns = ["timestamp", "entrance_amount", "exit_amount", "temperature", "humidity", "parking_entrance", "parking_exit", "parking_actual_vehicle"]
+    df = generate_dataFrame(columns)
+    write_data_kafka(df)
+    add_datatokafka()
